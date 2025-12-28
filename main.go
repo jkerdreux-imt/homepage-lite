@@ -80,7 +80,9 @@ type ServiceGroup struct {
 
 type Service struct {
 	Name        string `yaml:"name"`
-	URL         string `yaml:"url"`
+	URL         string `yaml:"url"`         // URL for browser visits (external)
+	PingURL     string `yaml:"pingUrl"`     // URL for health checks (overrides url if set, optional)
+	Ping        *bool  `yaml:"ping"`         // Enable/disable health checks (default: true, set to false to disable)
 	Description string `yaml:"description"`
 	Icon        string `yaml:"icon"`
 	Status      string `yaml:"-"`
@@ -323,7 +325,7 @@ func getServiceStatus(url string) string {
 	if status, exists := serviceStatus[url]; exists {
 		return status
 	}
-	return "checking"
+	return "unknown"
 }
 
 // updateServiceStatusLoop runs in background and updates all service statuses periodically
@@ -353,14 +355,27 @@ func updateAllServiceStatus() {
 	for _, group := range services {
 		for _, service := range group.Items {
 			wg.Add(1)
-			go func(url string) {
+			go func(serviceURL, pingURL string, pingEnabled bool) {
 				defer wg.Done()
-				status := checkServiceStatus(url)
+				var status string
+				
+				// If ping is disabled, set status to "unknown" without checking
+				if !pingEnabled {
+					status = "unknown"
+				} else {
+					// Use pingURL if provided, otherwise use serviceURL
+					checkURL := pingURL
+					if checkURL == "" {
+						checkURL = serviceURL
+					}
+					status = checkServiceStatus(checkURL)
+				}
 
+				// Store status keyed by serviceURL (for browser visits) so frontend can match it
 				mu.Lock()
-				tempStatus[url] = status
+				tempStatus[serviceURL] = status
 				mu.Unlock()
-			}(service.URL)
+			}(service.URL, service.PingURL, service.Ping == nil || *service.Ping)
 		}
 	}
 
