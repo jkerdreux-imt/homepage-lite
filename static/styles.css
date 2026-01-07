@@ -8,21 +8,28 @@
 
 html {
     height: 100%;
+    overflow: hidden;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: #1a1a2e;
     color: var(--text-primary);
-    min-height: 100%;
+    height: 100%;
     padding: 1rem;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
-body::before {
-    content: '';
+.fixed-bg {
     position: fixed;
     top: 0;
     left: 0;
@@ -35,6 +42,9 @@ body::before {
     filter: blur(2px) saturate(100%) brightness(70%);
     opacity: 0.5;
     z-index: -1;
+    /* Prevent background from resizing on mobile */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .container {

@@ -146,6 +146,18 @@ function performSearch(query) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Lock body height to prevent viewport changes from affecting background
+    const lockBodyHeight = () => {
+        document.body.style.height = `${window.innerHeight}px`;
+    };
+    
+    // Set initial height on load
+    lockBodyHeight();
+    window.addEventListener('load', lockBodyHeight);
+    
+    // Only update on orientation changes, not on scroll
+    window.addEventListener('orientationchange', () => setTimeout(lockBodyHeight, 100));
+    
     // Load saved theme and layout
     loadTheme();
     loadLayout();
