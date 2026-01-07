@@ -101,6 +101,7 @@ type Settings struct {
 	Title     string `yaml:"title"`
 	Port      int    `yaml:"port"`       // Server port (default: 8080)
 	ShowTitle bool   `yaml:"show_title"` // Show title in header (default: true)
+	Favicon   string `yaml:"favicon"`    // Favicon URL or data URI (default: home emoji)
 }
 
 // SystemMetrics holds all system metrics collected for display
